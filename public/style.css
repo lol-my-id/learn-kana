@@ -1,0 +1,109 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+div.select button {
+    margin: 10px 2px;
+    padding: 15px;
+    border-radius: 20px;
+    border: none;
+    transition: .2s;
+}
+
+div.select button.selected {
+    background-color: #114411;
+    color: white;
+}
+
+span#good {
+    color: blueviolet;
+}
+
+span#bad {
+    color: red;
+}
+
+button.skip {
+    border: none;
+    color: darkgray;
+    text-decoration: underline;
+
+    background-color: transparent;
+    font-size: large;
+}
+
+button.skip:hover {
+    transition: .2s;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+div.select button:hover {
+    transition: .2s;
+    cursor: pointer;
+    opacity: 0.5;
+    color: white;
+    background-color: gray;
+}
+
+div.container, div.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    align-content: center;
+
+    align-self: center;
+    justify-self: center;
+
+    height: 100vh;
+    width: 400px;
+}
+
+
+/* TODO: only with media if height lower than x */
+div.content {
+    margin-bottom: calc(100vh / 3);
+}
+
+.motto {
+    margin-bottom: 30px;
+    font-size: xx-large;
+}
+
+div.game {
+
+    display: flex;
+    flex-direction: column;
+
+    justify-items: center;
+    align-items: center;
+    
+    text-align: center;
+
+    background-color:darkslategrey;
+    color: white;
+    
+    border: 1px solid black;
+    padding: 40px;
+
+    border: none;
+    border-radius: 25px;
+}
+
+div.game span.word {
+    font-size: xx-large;
+}
+
+div.game input[type="text"] {
+    width: 250px;
+    height: 50px;
+
+    border-radius: 25px;
+    border: none;
+
+    font-size: x-large;
+    text-align: center;
+}
