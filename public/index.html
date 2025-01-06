@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>Practice Hiragana & Katakana by Reading Words</title>
+    <meta name="title" content="Practice Hiragana & Katakana by Reading Words" />
+    <meta name="description" content="Practice reading Hiragana and Katakana by reading words in Japanese. Ideal for beginners who want to learn and improve their skills with real vocabulary examples." />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kana.lol.my.id/" />
+    <meta property="og:title" content="Practice Hiragana & Katakana by Reading Words" />
+    <meta property="og:description" content="Practice reading Hiragana and Katakana by reading words in Japanese. Ideal for beginners who want to learn and improve their skills with real vocabulary examples." />
+    <meta property="og:image" content="https://kana.lol.my.id/show.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://kana.lol.my.id/" />
+    <meta property="twitter:title" content="Practice Hiragana & Katakana by Reading Words" />
+    <meta property="twitter:description" content="Practice reading Hiragana and Katakana by reading words in Japanese. Ideal for beginners who want to learn and improve their skills with real vocabulary examples." />
+    <meta property="twitter:image" content="https://kana.lol.my.id/show.png" />
+
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <p class="motto">Learn to read Kana!</p>
+            <div class="select">
+                <button class="selected" x-value="h">Hiragana</button>
+                <button x-value="k">Katakana</button>
+                <button x-value="m">Mixed</button>
+            </div>
+            <br>
+            <div class="game">
+                <span class="word" id="word"></span>
+                <br>
+                <input type="text" name="userInput" id="userInput">
+                <br>
+                <button onclick="skip()" class="skip">skip</button>
+                <br>
+                <p>
+                    Good: <span id="good">0</span>&nbsp;|&nbsp;
+                    Bad: <span id="bad">0</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script>
+        let nextWord = "";
+        let alphabet = "h";
+        let good = 0, bad = 0;
+
+        const word = document.querySelector(".word");
+        const selectAlphabet = document.querySelector(".select");
+        const userInput = document.querySelector("#userInput");
+
+        const goodSpan = document.querySelector("#good");
+        const badSpan = document.querySelector("#bad");
+
+        async function getNextValidWord() {
+            async function retryUntilValid() {
+                const word = await getWord(alphabet);
+                console.log(word);
+        
+                if (!word) {
+                    await delay(200);
+                    return await retryUntilValid();
+                }
+        
+                if (
+                    (alphabet === "h" && !isHiragana(word)) ||
+                    (alphabet === "k" && !isKatakana(word))
+                ) {
+                    return await retryUntilValid();
+                }
+        
+                // Valid word found
+                return word;
+            }
+        
+            return await retryUntilValid();
+        }
+        
+
+        async function skip(addBad = true) {
+            userInput.value = "";
+            if(addBad) {
+                bad++;
+                // TODO: custom alerts
+                alert(`Valid answer: ${romanize(word.textContent)}`)
+            }
+
+            if(word.textContent == "") {
+                word.textContent = await getNextValidWord();
+            } else {
+                word.textContent = nextWord;
+            }
+            
+            nextWord = await getNextValidWord();
+
+            update();
+        }
+
+        function changeAlphabet(which) {
+            [...selectAlphabet.children].map(x => {
+                x.classList.remove("selected");
+            });
+
+            bad = 0;
+            good = 0;
+
+            which.classList.add("selected");
+            alphabet = which.getAttribute("x-value");
+
+            skip(false);
+        }
+
+        function update() {
+            goodSpan.textContent = good;
+            badSpan.textContent = bad;
+        }
+
+        userInput.addEventListener("change", ()=>{
+            if(userInput.value != romanize(word.textContent)) return;
+
+            good++;
+            skip(false);
+        });
+
+        [...selectAlphabet.children].map(x => {
+            x.addEventListener("click", changeAlphabet.bind(this, x))
+        })
+
+        // Begin logic
+        window.onload = () => skip(false);
+    </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "learnkana",
+  "version": "1.0.0",
+  "description": "Practice reading Hiragana and Katakana by reading words in Japanese. Ideal for beginners who want to learn and improve their skills with real vocabulary examples.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "js",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parse": "^5.6.0",
+    "express": "^4.21.2",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0"
+  }
+}
