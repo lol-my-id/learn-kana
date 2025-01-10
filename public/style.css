@@ -1,7 +1,57 @@
+:root {
+    --bg-color: #ffffff;
+
+    --main-text-color: #ffffff;
+    --game-bg-color: #304F4F;
+
+    --pw-text: #ffffff;
+    --pw-bg-color: #1C3D3D;
+
+    --header-color: #000000;
+    
+    --button-hover-bg: #808080;
+    --button-selected: #114411;
+
+    --stat-good: #8a2be2;
+    --stat-bad: #ff0000;
+
+    --background-image: url("https://www.pngarts.com/files/8/Anime-PNG-Image-Transparent.png");
+}
+
 * {
     font-family: Arial, Helvetica, sans-serif;
     padding: 0;
+    margin: 0;   
+}
+
+body {
     margin: 0;
+    font-family: Arial, sans-serif;
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--background-image) no-repeat;
+    background-size: contain;
+    opacity: 0.5; /* Adjust opacity */
+    z-index: -1; /* Keeps it behind the content */
+}
+
+.container {
+    position: relative;
+    z-index: 1; /* Ensure content stays above the background */
+}
+
+body {
+    background-color: var(--bg-color);
 }
 
 div.select button {
@@ -13,16 +63,16 @@ div.select button {
 }
 
 div.select button.selected {
-    background-color: #114411;
+    background-color: var(--button-selected);
     color: white;
 }
 
 span#good {
-    color: blueviolet;
+    color: var(--stat-good);
 }
 
 span#bad {
-    color: red;
+    color: var(--stat-bad);
 }
 
 button.skip {
@@ -45,7 +95,7 @@ div.select button:hover {
     cursor: pointer;
     opacity: 0.5;
     color: white;
-    background-color: gray;
+    background-color: var(--button-hover-bg);
 }
 
 div.container, div.content {
@@ -65,12 +115,55 @@ div.container, div.content {
 
 /* TODO: only with media if height lower than x */
 div.content {
-    margin-bottom: calc(100vh / 3);
+    margin-bottom: calc(100vh / 10);
 }
 
 .motto {
+    color: var(--header-color);
     margin-bottom: 30px;
     font-size: xx-large;
+}
+
+div.right {
+    align-items: start;
+    justify-content: center;
+
+    width: 100%;
+}
+
+.meaning, .reading {
+    text-align: start;
+}
+
+div.left {
+    width: 80%;
+    justify-content: center;
+    font-size:xx-large;
+    align-items: center;
+}
+
+div.left, div.right {
+    display: flex;
+    margin: 10px;
+
+    flex-direction: column;
+
+    height:100%;
+}
+
+div.previousWord {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    /* border: 1px solid black; */
+    border-radius: 25px;
+    color: var(--pw-text);
+    background-color: var(--pw-bg-color);
+
+    width: 400px;
+    height: 100px;
 }
 
 div.game {
@@ -83,10 +176,9 @@ div.game {
     
     text-align: center;
 
-    background-color:darkslategrey;
-    color: white;
+    background-color: var(--game-bg-color);
+    color: var(--main-text-color);
     
-    border: 1px solid black;
     padding: 40px;
 
     border: none;

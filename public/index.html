@@ -31,7 +31,7 @@
 <body>
     <div class="container">
         <div class="content">
-            <p class="motto">Learn to read Kana!</p>
+            <p onclick="customizeCSSVariables()" class="motto">Learn to read Kana!</p>
             <div class="select">
                 <button class="selected" x-value="h">Hiragana</button>
                 <button x-value="k">Katakana</button>
@@ -50,14 +50,31 @@
                     Bad: <span id="bad">0</span>
                 </p>
             </div>
+            <br>
+            <div class="previousWord">
+                <div class="left">
+                    <p class="kanji">-</p>
+                </div>
+                <div class="right">
+                    Reading:
+                    <span class="reading">-</span>
+                    Meaning:
+                    <span class="meaning">-</span>
+                </div>
+                <!-- <p class="header">Previous word:</p> -->
+
+            </div>
         </div>
     </div>
     <script>
-        let nextWord = "";
+        let currentWord = {};
+        let nextWord = {};
         let alphabet = "h";
         let good = 0, bad = 0;
 
         const word = document.querySelector(".word");
+        const previousWord = document.querySelector(".previousWord");
+
         const selectAlphabet = document.querySelector(".select");
         const userInput = document.querySelector("#userInput");
 
@@ -75,8 +92,8 @@
                 }
         
                 if (
-                    (alphabet === "h" && !isHiragana(word)) ||
-                    (alphabet === "k" && !isKatakana(word))
+                    (alphabet === "h" && !isHiragana(word.reading)) ||
+                    (alphabet === "k" && !isKatakana(word.reading))
                 ) {
                     return await retryUntilValid();
                 }
@@ -88,44 +105,55 @@
             return await retryUntilValid();
         }
         
+        function setPreviousWord(word) {
+            const kanji = previousWord.querySelector(".kanji");
+            const reading = previousWord.querySelector(".reading");
+            const meaning = previousWord.querySelector(".meaning");
+            
+            [kanji, reading, meaning].forEach(element => {
+                element.textContent = currentWord[element.className] ?? "-";
+            });
+        }
 
         async function skip(addBad = true) {
             userInput.value = "";
             if(addBad) {
                 bad++;
                 // TODO: custom alerts
-                alert(`Valid answer: ${romanize(word.textContent)}`)
+                alert(`Answer: ${romanize(word.textContent)}`);
             }
 
             if(word.textContent == "") {
-                word.textContent = await getNextValidWord();
+                currentWord = await getNextValidWord();
             } else {
-                word.textContent = nextWord;
+                setPreviousWord(currentWord);
+                currentWord = nextWord;
             }
             
+            word.textContent = currentWord.reading;
             nextWord = await getNextValidWord();
 
-            update();
+            goodSpan.textContent = good;
+            badSpan.textContent = bad;
         }
 
-        function changeAlphabet(which) {
+        function changeAlphabet(elementClicked) {
             [...selectAlphabet.children].map(x => {
                 x.classList.remove("selected");
             });
 
-            bad = 0;
-            good = 0;
+            // TODO: reconsider whether resetting score each alphabet change should be how its done
+            // bad = 0; good = 0;
 
-            which.classList.add("selected");
-            alphabet = which.getAttribute("x-value");
+            elementClicked.classList.add("selected");
+            alphabet = elementClicked.getAttribute("x-value");
 
             word.textContent = "";
             skip(false);
-        }
 
-        function update() {
-            goodSpan.textContent = good;
-            badSpan.textContent = bad;
+            if(alphabet != "h") {
+                alert(`Disclaimer: Katakana is primarily used for writing foreign words, names, and loanwords in Japanese. While it may occasionally appear in other contexts, its main purpose is to represent non-Japanese terms. It is important to note that Kana, including Hiragana and Katakana, are distinct, and Hiragana is used for native Japanese words and grammatical functions.\n\nTLDR: If you are using this site to learn vocabulary (unadvised), you should do Hiragana. Katakana is mainly used to represent foreign words`);
+            }
         }
 
         userInput.addEventListener("change", ()=>{
@@ -135,8 +163,8 @@
             skip(false);
         });
 
-        [...selectAlphabet.children].map(x => {
-            x.addEventListener("click", changeAlphabet.bind(this, x))
+        [...selectAlphabet.children].map(element => {
+            element.addEventListener("click", changeAlphabet.bind(this, element))
         })
 
         // Begin logic

@@ -51,8 +51,8 @@ const katakanaToRomaji = {
     "ダ": "da", "ヂ": "ji", "ヅ": "zu", "デ": "de", "ド": "do",
     "バ": "ba", "ビ": "bi", "ブ": "bu", "ベ": "be", "ボ": "bo",
     "パ": "pa", "ピ": "pi", "プ": "pu", "ペ": "pe", "ポ": "po",
-    "キャ": "kya", "キュ": "kyu", "キョ": "kyo",
-    "シャ": "sha", "シュ": "shu", "ショ": "sho",
+    "キャ": "kya", "キュ": "kyu", "キョ": "kyo", "ヴェ": "we",
+    "シャ": "sha", "シュ": "shu", "ショ": "sho", "シェ": "she",
     "チャ": "cha", "チュ": "chu", "チョ": "cho", "チェ": "che",
     "ニャ": "nya", "ニュ": "nyu", "ニョ": "nyo",
     "ヒャ": "hya", "ヒュ": "hyu", "ヒョ": "hyo",
@@ -111,11 +111,202 @@ function romanize(input) {
     return output;
 }
 
-async function getWord(l) {
-    const x = await fetch("/random/"+l);
-    if(x.ok) {
-        return await x.text();
+async function getWord(alphabet) {
+    const randomReq = await fetch("/random/"+alphabet);
+    if(!randomReq.ok) {
+        return false;
     }
 
-    return false;
+    return await randomReq.json();
 }
+
+function resetCSSVariablesToDefaults() {
+    const defaultVariables = {
+        '--bg-color': '#ffffff',
+        '--main-text-color': '#ffffff',
+        '--game-bg-color': '#304F4F',
+        '--pw-text': '#ffffff',
+        '--pw-bg-color': '#1C3D3D',
+        '--header-color': '#000000',
+        '--button-hover-bg': '#808080',
+        '--button-selected': '#114411',
+        '--stat-good': '#8a2be2',
+        '--stat-bad': '#ff0000',
+        '--background-image': 'url("https://www.pngarts.com/files/8/Anime-PNG-Image-Transparent.png")'
+    };
+
+    for (const [variable, value] of Object.entries(defaultVariables)) {
+        document.documentElement.style.setProperty(variable, value);
+    }
+}
+
+function saveCSSVariablesToLocalStorage() {
+    const variables = [
+        '--bg-color', '--main-text-color', '--game-bg-color',
+        '--pw-text', '--pw-bg-color', '--header-color',
+        '--button-hover-bg', '--button-selected', '--stat-good', '--stat-bad', '--background-image'
+    ];
+
+    const savedVariables = {};
+
+    variables.forEach(variable => {
+        const value = getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+        savedVariables[variable] = value;
+    });
+
+    localStorage.setItem('cssVariables', JSON.stringify(savedVariables));
+    alert('CSS settings saved!');
+}
+
+function loadCSSVariablesFromLocalStorage() {
+    const savedVariables = JSON.parse(localStorage.getItem('cssVariables'));
+
+    if (savedVariables) {
+        for (const [variable, value] of Object.entries(savedVariables)) {
+            document.documentElement.style.setProperty(variable, value);
+        }
+    }
+}
+
+function customizeCSSVariables() {
+    if(document.querySelector("#popup")) {
+        return;
+    }
+    
+    // Create the popup container
+    const popup = document.createElement('div');
+    popup.id = "popup";
+    popup.style.position = 'fixed';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.backgroundColor = 'white';
+    popup.style.padding = '20px';
+    popup.style.border = '1px solid #ccc';
+    popup.style.borderRadius = '10px';
+    popup.style.zIndex = '1000';
+    popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+    popup.style.width = '300px';
+    popup.style.fontFamily = 'Arial, sans-serif';
+    popup.style.overflow = "auto";
+    popup.style.maxHeight = "60vh";
+
+    // Make the popup draggable
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    // Title
+    const title = document.createElement('h3');
+    title.textContent = 'Customize CSS Variables';
+    title.style.marginBottom = '15px';
+    title.style.color = 'black';
+    title.style.cursor = 'move'; // Make title draggable
+    popup.appendChild(title);
+
+    // Add mouse event listeners to make the popup draggable
+    title.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - popup.getBoundingClientRect().left;
+        offsetY = e.clientY - popup.getBoundingClientRect().top;
+        document.addEventListener('mousemove', dragPopup);
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            document.removeEventListener('mousemove', dragPopup);
+        });
+    });
+
+    function dragPopup(e) {
+        if (isDragging) {
+            popup.style.left = `${e.clientX - offsetX}px`;
+            popup.style.top = `${e.clientY - offsetY}px`;
+        }
+    }
+
+    // Input fields for each variable
+    const variables = {
+        '--bg-color': "Background",
+        '--main-text-color': "Foreground", 
+        '--game-bg-color': "Main Window Bg",
+        '--pw-text': "Previous Word Text",
+        '--pw-bg-color': "Previous Word Bg",
+        '--header-color': "Header",
+        '--button-hover-bg': "Change Alphabet Hover",
+        '--button-selected': "Alphabet selected",
+        '--stat-good': "Good", 
+        '--stat-bad': "Bad"
+    }
+
+    function addLabeledInput(variable, labelText, inputType) {
+        const wrapper = document.createElement('div');
+        wrapper.style.marginBottom = '10px';
+
+        const label = document.createElement('label');
+        label.textContent = labelText;
+        label.style.display = 'block';
+        label.style.marginBottom = '5px';
+
+        const input = document.createElement('input');
+        input.type = inputType;
+        input.value = getComputedStyle(document.documentElement).getPropertyValue(variable).trim() || '#ffffff';
+        input.style.width = '100%';
+        input.addEventListener('input', () => {
+            document.documentElement.style.setProperty(variable, input.value);
+        });
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+
+        return wrapper;
+    }
+
+    Object.keys(variables).forEach(variable => {
+        popup.appendChild(addLabeledInput(variable, variables[variable] + ': ', 'color'));
+    });
+
+    popup.appendChild(addLabeledInput('--background-image', 'Background Image URL' + ': ', 'text'));
+
+    // Close button
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'Close';
+    closeButton.style.marginTop = '15px';
+    closeButton.style.padding = '10px';
+    closeButton.style.width = '100%';
+    closeButton.style.border = 'none';
+    closeButton.style.borderRadius = '5px';
+    closeButton.style.backgroundColor = '#444';
+    closeButton.style.color = 'white';
+    closeButton.style.cursor = 'pointer';
+
+    const saveButton = closeButton.cloneNode();
+    saveButton.textContent = "Save";
+    saveButton.style.backgroundColor = '#141';
+
+    const resetButton = closeButton.cloneNode();
+    resetButton.textContent = "Reset";
+    resetButton.style.backgroundColor = '#411';
+
+    closeButton.addEventListener('click', () => {
+        document.body.removeChild(popup);
+    });
+
+    resetButton.addEventListener('click', () => {
+        resetCSSVariablesToDefaults();
+        saveCSSVariablesToLocalStorage();
+        document.body.removeChild(popup);
+    });
+
+    saveButton.addEventListener('click', () => {
+        saveCSSVariablesToLocalStorage();
+        document.body.removeChild(popup);
+    });
+
+    popup.appendChild(resetButton);
+    popup.appendChild(closeButton);
+    popup.appendChild(saveButton);
+
+    // Append popup to the document body
+    document.body.appendChild(popup);
+}
+
+
+window.addEventListener('DOMContentLoaded', loadCSSVariablesFromLocalStorage);
