@@ -1,14 +1,20 @@
 import { parse } from "csv-parse";
 import { readFileSync } from "fs";
+import { Word } from "./types";
 
-export function parseHiragana(): Promise<Array<string>> {
-    const hiraganaRecords = [];
+export function parseHiragana(): Promise<Array<Word>> {
+    const hiraganaRecords: Array<Word> = [];
     return new Promise((resolve,reject)=>{
         const parser = parse(readFileSync("./hiragana.csv"), { delimiter: "," });
         parser.on("readable", function () {
             let record: any;
             while ((record = parser.read()) !== null) {
-                hiraganaRecords.push(record[1]);
+                hiraganaRecords.push({
+                    reading: record[1],
+                    meaning: record[2],
+                    kanji: record[0],
+                    alphabet: "hiragana"
+                });
             }
         });
     
@@ -19,8 +25,8 @@ export function parseHiragana(): Promise<Array<string>> {
     })
 }
 
-export function parseKatakana(): Promise<Array<string>> {
-    const katakanaRecords = [];
+export function parseKatakana(): Promise<Array<Word>> {
+    const katakanaRecords: Array<Word> = [];
     return new Promise((resolve,reject)=>{
         const parser = parse(readFileSync("./katakana.csv"), { delimiter: "," });
         parser.on("readable", function () {
@@ -29,7 +35,11 @@ export function parseKatakana(): Promise<Array<string>> {
                 if((record?.[1] ?? "").toString().includes("・"))
                     continue;
 
-                katakanaRecords.push(record[1]);
+                katakanaRecords.push({
+                    reading: record[1],
+                    meaning: record[0],
+                    alphabet: "katakana"
+                });
             }
         });
     

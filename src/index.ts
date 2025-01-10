@@ -1,4 +1,6 @@
-import express from "express";
+import express, { Request, Response } from "express";
+import log from "./logger";
+
 import { parseHiragana, parseKatakana } from "./parser";
 import { randomEntry } from "./utils";
 
@@ -10,22 +12,22 @@ let katakanaRecords = [];
 
 app.use(express.static('./public'));
 
-app.get('/random/:what', (req, res) => {
+app.get('/random/:alphabet', (req: Request, res: Response) => {
     try {
-        const what = req.params.what;
+        const what = req.params.alphabet;
 
         switch(what) {
             case "h":
             case "hiragana":
-                res.status(200).send(randomEntry(hiraganaRecords)); // csv entry
+                res.status(200).json(randomEntry(hiraganaRecords)); // csv entry
                 break;
             case "k":
             case "katakana":
-                res.status(200).send(randomEntry(katakanaRecords)); // csv entry
+                res.status(200).json(randomEntry(katakanaRecords)); // csv entry
                 break;
             case "m":
             case "mix":
-                res.status(200).send(randomEntry(Math.floor(Math.random() * 2) ? hiraganaRecords : katakanaRecords)); // csv entry
+                res.status(200).json(randomEntry(Math.floor(Math.random() * 2) ? hiraganaRecords : katakanaRecords)); // csv entry
                 break;
         }
     
@@ -36,8 +38,17 @@ app.get('/random/:what', (req, res) => {
 })
   
 app.listen(PORT, async () => {
-    hiraganaRecords = await parseHiragana();
-    katakanaRecords = await parseKatakana();
+    log.info("Parsing alphabets");
+
+    try {
+        hiraganaRecords = await parseHiragana();
+        katakanaRecords = await parseKatakana();
+    } catch(err) {
+        log.error("Unable to parse alphabets")
+        log.fatal(err);
+        process.exit(1);
+    }
     
-    console.log(`Japanese learning app listening on port ${PORT}`)
+    log.info("Alphabets parsed");
+    log.info(`Japanese learning app is ready and listening on port ${PORT}`)
 })
