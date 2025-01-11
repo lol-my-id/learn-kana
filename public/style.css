@@ -22,6 +22,7 @@
     font-family: Arial, Helvetica, sans-serif;
     padding: 0;
     margin: 0;   
+    box-sizing: border-box;
 }
 
 body {
@@ -109,7 +110,15 @@ div.container, div.content {
     justify-self: center;
 
     height: 100vh;
-    width: 400px;
+    /* width: 400px; */
+}
+
+div.content > * {
+    margin: 5px 0;
+}
+
+div.game > * {
+    margin: 4px 0;
 }
 
 
