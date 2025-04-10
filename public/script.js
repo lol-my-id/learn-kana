@@ -120,6 +120,7 @@ async function getWord(alphabet) {
     return await randomReq.json();
 }
 
+// #region Customization
 function resetCSSVariablesToDefaults() {
     const defaultVariables = {
         '--bg-color': '#ffffff',
@@ -310,3 +311,5 @@ function customizeCSSVariables() {
 
 
 window.addEventListener('DOMContentLoaded', loadCSSVariablesFromLocalStorage);
+//#endregion
+// It's a weird thing to put in such a simple website

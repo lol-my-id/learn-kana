@@ -156,8 +156,8 @@
             }
         }
 
-        userInput.addEventListener("change", ()=>{
-            if(userInput.value != romanize(word.textContent)) return;
+        userInput.addEventListener("input", ()=>{
+            if(userInput.value.toLowerCase() != romanize(word.textContent).toLowerCase()) return;
 
             good++;
             skip(false);
