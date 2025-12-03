@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import log from "./logger";
 
 import { parseHiragana, parseKatakana } from "./parser";
-import { randomEntry } from "./utils";
+import { randomKanaEntry } from "./utils";
 
 const PORT = 8080;
 const app = express();
@@ -19,15 +19,20 @@ app.get('/random/:alphabet', (req: Request, res: Response) => {
         switch(what) {
             case "h":
             case "hiragana":
-                res.status(200).json(randomEntry(hiraganaRecords)); // csv entry
+                res.status(200).json(randomKanaEntry(hiraganaRecords, 'hiragana'));
                 break;
             case "k":
             case "katakana":
-                res.status(200).json(randomEntry(katakanaRecords)); // csv entry
+                res.status(200).json(randomKanaEntry(katakanaRecords, 'katakana'));
                 break;
             case "m":
             case "mix":
-                res.status(200).json(randomEntry(Math.floor(Math.random() * 2) ? hiraganaRecords : katakanaRecords)); // csv entry
+                // randomly pick hiragana or katakana and return a kana-only entry
+                if (Math.random() < 0.5) {
+                    res.status(200).json(randomKanaEntry(hiraganaRecords, 'hiragana'));
+                } else {
+                    res.status(200).json(randomKanaEntry(katakanaRecords, 'katakana'));
+                }
                 break;
         }
     
